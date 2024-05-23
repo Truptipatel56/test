@@ -1,0 +1,180 @@
+{% if section.settings.divider %}<div class="section--divider">{% endif %}
+<div
+  class="page-width"
+  data-section-id="{{ section.id }}"
+  data-section-type="testimonials_video">
+  {% if section.settings.title != blank %}
+    <div class="section-header">
+      <h2>{{ section.settings.title | escape }}</h2>
+    </div>
+  {% endif %}
+
+  {% if section.blocks.size > 0 %}
+    <div class="testimonials_video_wrapper">
+      <div class="testimonials_video_slider" id="Testimonials-{{ section.id }}" data-count="{{ section.blocks.size }}">
+                  {% assign  va_id = 0 %}
+        {% for block in section.blocks %}
+          <div
+            class="testimonials_video_slide testimonials_video_slide--{{ block.id }}"
+            data-aos="row-of-{{ section.blocks.size }}"
+            {{ block.shopify_attributes }} >
+              {% if block.settings.video != blank %}
+                <div class="vid_pa">
+              <video width="100%" height="500px" class="video" style="display: block;"  loop playsinline >
+                 <source src="{{block.settings.video.sources[1].url}}" type="video/mp4">
+              </video>
+                   <button class="play_button" >{% render 'icon-play' %}</button>
+            <button class="pause_button" active >{% render 'icon-play' %}</button>
+                </div>
+             <div class="vid_pa_a" style="display: none">
+              <video width="100%" height="500px" class="video" style="display: block;" loop playsinline>
+                 <source src="{{block.settings.video.sources[1].url}}" type="video/mp4">
+              </video>
+                <button class="play_button" >{% render 'icon-play' %}</button>
+            <button class="pause_button" active >{% render 'icon-play' %}</button>
+                </div>
+           
+             {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+{% if section.settings.divider %}</div>{% endif %}
+
+<style>
+  .testimonials_video_slider {    margin: 0 -15px; display: grid;
+    grid-template-columns: repeat(2, 1fr); }
+ .testimonials_video_slide {  padding: 0 15px; position: relative; opacity: 0.5; }
+  .testimonials_video_slide button{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .testimonials_video_slide.slick-slide video{    border-radius: 50px; }
+  .testimonials_video_slide  button[active]{ display : none;}
+</style>
+
+
+<link href="//vjs.zencdn.net/7.10.2/video-js.min.css" rel="stylesheet">
+<script src="//vjs.zencdn.net/7.10.2/video.min.js"></script>
+<script>
+$(document).ready(function(){
+ 
+$('.testimonials_video_slide .vid_pa .video').on('mouseenter', function(){
+      $(this).parents('.testimonials_video_slide').css('opacity', '1'); 
+      $(this).prop('muted', 'true');
+    $(this).parents('.testimonials_video_slide').find('.vid_pa .video').trigger("play");
+}).on('mouseleave', function(){
+   $(this).parents('.testimonials_video_slide').css('opacity', '0.5');
+        $(this).parents('.testimonials_video_slide').find('.vid_pa .video').trigger("pause");
+}); 
+
+var mouseenter = 0;
+// $(".testimonials_video_slide .play_button").click(function(){
+//     if(mouseenter==0)  
+//     {  
+//     $(".testimonials_video_slide .video").off('mouseenter'); 
+//      mouseenter=1; 
+//     }
+//     else
+//     {    
+//     $('.testimonials_video_slide .video').on('mouseenter', function(){
+//     $(this).parents('.testimonials_video_slide').css('opacity', '1'); 
+//     $(this).trigger("play");
+//     $(this).prop('muted', 'true');
+//   });
+//      mouseenter = 1;
+//     }
+// });
+
+$('.testimonials_video_slide  .play_button').on('click', function(){
+  debugger;
+  $(this).parents('.testimonials_video_slide').find('.vid_pa').css('display','none');
+  $(this).parents('.testimonials_video_slide').find('.vid_pa_a').css('display','block');
+    $(this).parents('.testimonials_video_slide').css('opacity', '1');
+    $(this).parents('.testimonials_video_slide').find('.vid_pa_a video').trigger("play");
+    $(this).parents('.testimonials_video_slide ').find('.pause_button').removeAttr('active');
+    $(this).parents('.testimonials_video_slide ').find('.play_button').attr('active','active');
+});
+$(document).on('click', '.testimonials_video_slide  .pause_button', function(){
+  $(this).parents('.testimonials_video_slide').css('opacity', '1');
+  $(this).parents('.testimonials_video_slide').find('.vid_pa').css('display','block');
+  $(this).parents('.testimonials_video_slide').find('.vid_pa_a').css('display','none');
+    $(this).parents('.testimonials_video_slide').find('.vid_pa_a video').trigger("pause");
+   $(this).parents('.testimonials_video_slide ').find('.play_button').removeAttr('active');
+  $(this).parents('.testimonials_video_slide ').find('.pause_button').attr('active','active');
+}); 
+
+  var videos = document.querySelectorAll('.vid_pa_a video');
+for(var i=0; i<videos.length; i++)
+   videos[i].addEventListener('play', function(){pauseAll(this)}, true);
+
+
+function pauseAll(elem){
+	for(var i=0; i<videos.length; i++){
+		//Is this the one we want to play?
+		if(videos[i] == elem) continue;
+		//Have we already played it && is it already paused?
+		if(videos[i].played.length > 0 && !videos[i].paused){
+		// Then pause it now
+		  videos[i].pause();
+		}
+	}
+  }
+
+});
+
+  
+
+
+</script>
+
+{% schema %}
+  {
+    "name": "Video Testimonials",
+    "class": "video_slider",
+    "max_blocks": 9,
+    "settings": [
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Heading",
+        "default": "Testimonials"
+      },
+      {
+        "type": "checkbox",
+        "id": "divider",
+        "label": "Show section divider",
+        "default": false
+      }
+    ],
+    "blocks": [
+      {
+        "type": "video_testimonial",
+        "name": "Video Testimonials",
+        "settings": [
+          {
+            "type": "video",
+            "id": "video",
+            "label": "Video"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Video Testimonials",
+        "category": "Video Testimonial",
+        "blocks": [
+          {
+            "type": "video_testimonial"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}
